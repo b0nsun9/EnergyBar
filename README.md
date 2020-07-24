@@ -1,0 +1,1 @@
+#Energy Bar (inspired Android's SnackBar)
