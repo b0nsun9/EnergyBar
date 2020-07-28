@@ -15,7 +15,7 @@ Pod::Spec.new do |spec|
   #  summary should be tweet-length, and the description more in depth.
   #
 
-  spec.name         = "EnergyBar.podspec"
+  spec.name         = "EnergyBar"
   spec.version      = "0.1.0"
   spec.summary      = "Simeple Message bar like Android's SnackBar"
 
