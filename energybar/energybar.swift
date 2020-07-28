@@ -14,7 +14,7 @@ public protocol EnergyBarDelegate: class {
 
 public class EnergyBar {
     
-    init() { }
+    public init() { }
     
     /// Energy Bar의 초기화
     ///
@@ -24,7 +24,7 @@ public class EnergyBar {
     /// 기본적으로 Energy Bar는 앱의 모든 화면에서 보이므로 어느 한 `ViewController`에 속하지 않도록 주의하자.
     ///
     
-    init(delegate: EnergyBarDelegate) {
+    public init(delegate: EnergyBarDelegate) {
         _delegate = delegate
     }
     
