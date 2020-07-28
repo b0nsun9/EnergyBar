@@ -8,19 +8,31 @@
 
 import UIKit
 
-protocol EnergyBarDelegate: class {
-    func buttonTap(tag: Int)
+public protocol EnergyBarDelegate: class {
+    func buttonTap(eventID: String, tag: Int)
 }
 
-class EnergyBar {
+public class EnergyBar {
     
     init() { }
+    
+    /// Energy Bar의 초기화
+    ///
+    /// - Parameter delegate: `EnergyBarDelegate` protocol을 준수하는 class
+    ///
+    /// - Note: Energy Bar의 Delgate는 `AppDelegate`에 추가하는 것을 권장한다.
+    /// 기본적으로 Energy Bar는 앱의 모든 화면에서 보이므로 어느 한 `ViewController`에 속하지 않도록 주의하자.
+    ///
     
     init(delegate: EnergyBarDelegate) {
         _delegate = delegate
     }
     
     private weak var _delegate: EnergyBarDelegate?
+    private var _currentMessage: UIVisualEffectView?
+    private var _eventID: String?
+    private var _size: CGSize?
+    private var _isShowing: Bool = false
     
     private var _currentWindow: UIWindow {
         if var topWindow = UIApplication.shared.keyWindow {
@@ -35,22 +47,25 @@ class EnergyBar {
         }
     }
     
-    private var _currentMessage: UIVisualEffectView?
-    
-    enum EnergyBarError: String, Error {
+    public enum EnergyBarError: String, Error {
         case delegateIsNil = "Delegate is Nil, call `setDelegate` and set delegate."
         case buttonCountIsZero = "This call have to have at least 1 button."
         case buttonTagIsNotSet = "Each button MUST set tag"
+        case energyBarAlreadyShowing = "Energy bar showing currently!"
     }
     
     @objc private func _tapButton(sender: UIButton) {
-        _delegate?.buttonTap(tag: sender.tag)
+        if let eventID = _eventID {
+            _delegate?.buttonTap(eventID: eventID, tag: sender.tag)
+        }
         _closeEnergyBar()
     }
         
     private func _closeEnergyBar() {
         _currentMessage?.removeFromSuperview()
         _currentMessage = nil
+        _eventID = nil
+        _isShowing = false
     }
     
     /// Energy Bar의 Delegate를 지정
@@ -61,15 +76,17 @@ class EnergyBar {
     /// 기본적으로 Energy Bar는 앱의 모든 화면에서 보이므로 어느 한 `ViewController`에 속하지 않도록 주의하자.
     ///
     
-    func setDelegate(delegate: EnergyBarDelegate) {
+    public func setDelegate(delegate: EnergyBarDelegate) {
         _delegate = delegate
     }
     
     /// Energy Bar를 보여준다.
     ///
+    /// - Parameter eventID: `EnergyBarDelegate`를 통해 전달 받을 EvnetID
+    ///
     /// - Parameter messageLabel: 이미 만들어진 `UILabel`객체
     ///
-    /// - Parameter actionButtons: 이미 만들어진 `UIButton`객체
+    /// - Parameter buttons: 이미 만들어진 `UIButton`객체들
     ///
     /// - Parameter size: Energy Bar의 `CGSize`크기
     ///
@@ -77,12 +94,16 @@ class EnergyBar {
     /// 기본적으로 Energy Bar는 앱의 모든 화면에서 보이므로 어느 한 `ViewController`에 속하지 않도록 주의하자.
     ///
     
-    
-    func show(messageLabel: UILabel, actionButtons: [UIButton], size: CGSize) throws {
+    public func show(eventID: String, messageLabel: UILabel, buttons: [UIButton], size: CGSize) throws {
         
         guard _delegate != nil else { throw EnergyBarError.delegateIsNil }
-        guard actionButtons.count != 0 else { throw EnergyBarError.buttonCountIsZero }
-        guard !actionButtons.contains(where: { $0.tag == 0 }) else { throw EnergyBarError.buttonTagIsNotSet }
+        guard buttons.count != 0 else { throw EnergyBarError.buttonCountIsZero }
+        guard !buttons.contains(where: { $0.tag == 0 }) else { throw EnergyBarError.buttonTagIsNotSet }
+        guard !_isShowing else { throw EnergyBarError.energyBarAlreadyShowing }
+        
+        _eventID = eventID
+        _size = size
+        _isShowing = true
         
         let blurView = UIVisualEffectView()
         blurView.translatesAutoresizingMaskIntoConstraints = false
@@ -102,7 +123,7 @@ class EnergyBar {
         
         var b = [UIButton]()
         
-        actionButtons.enumerated().forEach { button in
+        buttons.enumerated().forEach { button in
             
             button.element.translatesAutoresizingMaskIntoConstraints = false
             
@@ -151,14 +172,16 @@ class EnergyBar {
     /// 새로운(더 높은 Window Level) Window에 추가한다.
     /// 만약 `present()`메소드로 인해 현재 Window level이 변경되면 이 메소드를 호출한다.
     
-    func bringEnergyBarToFront() {
+    public func bringEnergyBarToFront() {
         
         _currentMessage?.removeFromSuperview()
         
-        guard let currentMessage = _currentMessage else { return }
+        guard
+            let currentMessage = _currentMessage,
+            let size = _size else { return }
         
-        let currentMessageConsts = [NSLayoutConstraint(item: currentMessage, attribute: .width, relatedBy: .equal, toItem: nil, attribute: .width, multiplier: 1, constant: currentMessage.bounds.width),
-                                    NSLayoutConstraint(item: currentMessage, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .height, multiplier: 1, constant: 48),
+        let currentMessageConsts = [NSLayoutConstraint(item: currentMessage, attribute: .width, relatedBy: .equal, toItem: nil, attribute: .width, multiplier: 1, constant: size.width),
+                                    NSLayoutConstraint(item: currentMessage, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .height, multiplier: 1, constant: size.height),
                                     NSLayoutConstraint(item: currentMessage, attribute: .centerX, relatedBy: .equal, toItem: self._currentWindow, attribute: .centerX, multiplier: 1, constant: 0),
                                     NSLayoutConstraint(item: currentMessage, attribute: .bottom, relatedBy: .equal, toItem: self._currentWindow.safeAreaLayoutGuide, attribute: .bottom, multiplier: 1, constant: -56)]
         
