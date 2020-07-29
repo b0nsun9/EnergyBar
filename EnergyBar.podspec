@@ -1,6 +1,6 @@
 Pod::Spec.new do |spec|
   spec.name         = "EnergyBar"
-  spec.version      = "0.1.2"
+  spec.version      = "0.1.3"
   spec.summary      = "Simeple Message bar like Android's SnackBar"
   spec.description  = <<-DESC
 Energy Bar is very simple message bar that get to user's response.
