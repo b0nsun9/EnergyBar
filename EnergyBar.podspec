@@ -25,7 +25,7 @@ Pod::Spec.new do |spec|
   #   * Write the description between the DESC delimiters below.
   #   * Finally, don't worry about the indent, CocoaPods strips it!
   spec.description  = <<-DESC
-  Simeple Message bar like Android's SnackBar
+Energy Bar is very simple message bar that get to user's response.
                    DESC
 
   spec.homepage     = "https://github.com/Koosj/EnergyBar"
@@ -39,7 +39,7 @@ Pod::Spec.new do |spec|
   #  Popular ones are 'MIT', 'BSD' and 'Apache License, Version 2.0'.
   #
 
-  spec.license      = { :type => "MIT" }
+  spec.license      = "MIT"
   # spec.license      = { :type => "MIT", :file => "FILE_LICENSE" }
 
 
@@ -56,7 +56,7 @@ Pod::Spec.new do |spec|
   spec.author             = { "Bonsung Koo" => "developer@koosj.io" }
   # Or just: spec.author    = "Bonsung Koo"
   # spec.authors            = { "Bonsung Koo" => "developer@koosj.io" }
-  # spec.social_media_url   = "https://twitter.com/koosj.io"
+  # spec.social_media_url   = "https://twitter.com/bonsung_"
 
   # ――― Platform Specifics ――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
   #
