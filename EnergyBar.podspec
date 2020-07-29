@@ -9,3 +9,4 @@ Pod::Spec.new do |spec|
   spec.platform     = :ios, "12.0"
   spec.source       = { :git => "https://github.com/Koosj/EnergyBar.git", :tag => "#{spec.version}" }
   spec.source_files = "energybar/*.swift"
+end
